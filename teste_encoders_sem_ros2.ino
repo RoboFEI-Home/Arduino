@@ -1,5 +1,5 @@
 #include <Sabertooth.h>
-#include <Encoder.h>
+//#include <Encoder.h>
 
 #include <stdio.h>
 
@@ -16,9 +16,9 @@ long odom_timer;
 
 float enc1, enc2, enc3;
 
-Encoder Encoder1(33, 35);
-Encoder Encoder2(37, 39);
-Encoder Encoder3(41, 43);
+//Encoder Encoder1(2, 3);
+//Encoder Encoder2(4, 5);
+//Encoder Encoder3(20, 21);
 
 float map(float x, float
 in_min, float in_max, float out_min, float out_max) {
@@ -26,7 +26,7 @@ in_min, float in_max, float out_min, float out_max) {
 }
 
 int convertToMotor(float value) {
-  float r = map(value, -10.0, 10.0, -127.0, 127.0);
+  float r = map(value, -1.0, 1.0, -127.0, 127.0);
   r = constrain(r, -127.0, 127.0);
   return (int) round(r);
 }
@@ -44,9 +44,9 @@ void stopMotors() {
 }
 
 void clearEncoders() {
-  Encoder1.write(0);
-  Encoder2.write(0);
-  Encoder3.write(0);
+  //Encoder1.write(0);
+  //Encoder2.write(0);
+  //Encoder3.write(0);
 }
 
 void setup() {
@@ -54,62 +54,108 @@ void setup() {
   pinMode(12, INPUT_PULLUP);
   pinMode(13, INPUT_PULLUP);
   
+
   SabertoothTXPinSerial.begin(9600);
 
   Serial.begin(9600);
 
   stopMotors();
 
-  clearEncoders();
+  // clearEncoders();
 
-  odom_timer = millis();
+  // odom_timer = millis();
+
 
 }
-
 void loop() {
-  
-  if (millis() - odom_timer >= ODOM_PERIOD) {
+  Serial.println("Teste");
+  for (float i=0;i<0.2;i+=0.02){
+    moveMotors(convertToMotor(i/2), convertToMotor(i/2), convertToMotor(-i));
+  }
+  delay(3000);
 
-    enc1 = Encoder1.read();
-    enc2 = Encoder2.read();
-    enc3 = Encoder3.read();
+  moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+  delay(500);
 
-    Serial.println(enc1 + enc2 + enc3);
-    
-    if (Serial.available() > 0) {
-      String cmd = Serial.readString();
-      int cmd_len = cmd.length() + 1;
-      char cmd_array[cmd_len];
-      cmd.toCharArray(cmd_array, cmd_len);
-      Serial.println(cmd);
+  for (float i=0;i<0.2;i+=0.01){
+    moveMotors(convertToMotor(-i), convertToMotor(i), convertToMotor(0.0));
+  }
+  delay(3000);
 
-      char* cmd1 = strtok(cmd_array, " ");
-      Serial.println(cmd1);
+  moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+  delay(500);
 
-      char* cmd2 = strtok(NULL, " ");
-      Serial.println(cmd2);
-
-      char* cmd3 = strtok(NULL, " ");
-      Serial.println(cmd3);
-      
-      float cmd1f = atof(cmd1);
-      float cmd2f = atof(cmd2);
-      float cmd3f = atof(cmd3);
-      Serial.println(cmd1f);
-      Serial.println(cmd2f);
-      Serial.println(cmd3f);
-      Serial.println(convertToMotor(cmd1f));
-      Serial.println(convertToMotor(cmd2f));
-      Serial.println(convertToMotor(cmd3f));
-      moveMotors(convertToMotor(cmd3f), convertToMotor(cmd2f), convertToMotor(cmd1f));
-    }
-   
-    
-    odom_timer = millis();
-
-    clearEncoders();
-
-
+  for (float i=0;i<0.2;i+=0.01){
+    moveMotors(convertToMotor(-i/2), convertToMotor(-i/2), convertToMotor(i));
   }
 
+  delay(3000);
+
+  moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+  delay(500);
+
+  for (float i=0;i<0.2;i+=0.01){
+    moveMotors(convertToMotor(i), convertToMotor(-i), convertToMotor(0.0));
+  }
+
+  delay(3000);
+
+  moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+  delay(500);
 }
+// //movimento 1
+  
+//   moveMotors(convertToMotor(0.0), convertToMotor(0.2), convertToMotor(-0.2));
+//   delay(2000);
+   
+  
+// //pausa  
+//   moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+//   delay(700);
+
+// //movimento 2
+//   moveMotors(convertToMotor(0.3), convertToMotor(-0.2), convertToMotor(-0.2));
+//   delay(2000);
+
+// //pausa  
+//   moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+//   delay(700);
+
+
+// //movimento 3
+
+//   moveMotors(convertToMotor(0.0), convertToMotor(-0.2), convertToMotor(0.2));
+//   delay(2000);
+
+// //pausa  
+//   moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+//   delay(700);
+
+
+// //movimento 4  
+//   moveMotors(convertToMotor(-0.3), convertToMotor(0.2), convertToMotor(0.2));
+//   delay(2000);
+
+
+// //pausa  
+//   moveMotors(convertToMotor(0.0), convertToMotor(0.0), convertToMotor(0.0));
+//   delay(700);
+
+
+// // if (millis() - odom_timer >= ODOM_PERIOD) {
+
+//     // enc1 = Encoder1.read();
+//     // enc2 = Encoder2.read();
+//     // enc3 = Encoder3.read();
+
+//     // Serial.println(enc1);
+//     // Serial.println(enc2);
+//     // Serial.println(enc3);
+//     // Serial.println("-----");
+    
+    // odom_timer = millis();
+
+    // clearEncoders();
+
+
+  //}
