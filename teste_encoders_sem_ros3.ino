@@ -17,6 +17,9 @@ long odom_timer;
 
 float enc1, enc2, enc3;
 
+StaticJsonDocument<200> cmd;
+StaticJsonDocument<200> state;
+
 Encoder Encoder1(33, 35);
 Encoder Encoder2(37, 39);
 Encoder Encoder3(41, 43);
@@ -75,18 +78,30 @@ void loop() {
     enc2 = Encoder2.read();
     enc3 = Encoder3.read();
 
-    // Serial.println(enc1 + enc2 + enc3);
+    //Serial.println(enc1 + enc2 + enc3);
 
-    StaticJsonDocument<512> doc;
+    JsonArray encdata = state.createNestedArray("encoders");
+    encdata.add(enc1);
+    encdata.add(enc2);
+    encdata.add(enc3);
+
+    serializeJson(state, Serial);
     
-    String cmd = Serial.readString();
-    deserializeJson(doc, cmd);
-    double m1 = doc["motors"][3];
-    double m2 = doc["motors"][2];
-    double m3 = doc["motors"][1];
+    if(Serial.available() > 0){
+      String cmdmessage = Serial.readString();
+      Serial.flush();
+      deserializeJson(cmd, cmdmessage);
+      double m1 = cmd["motors"][2];
+      double m2 = cmd["motors"][1];
+      double m3 = cmd["motors"][0];
 
-    moveMotors(convertToMotor(m1), convertToMotor(m2), convertToMotor(m3));
+      //Serial.println(m1);
+      //Serial.println(m2);
+      //Serial.println(m3);
 
+      moveMotors(convertToMotor(m1), convertToMotor(m2), convertToMotor(m3));
+    }
+    
    
     
     odom_timer = millis();
